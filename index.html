@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chai House Sales Dashboard · Data project</title>
+<meta name="description" content="An interactive sales dashboard built with plain JavaScript and hand-drawn SVG charts. Filter by date and category, view every chart as a table, or upload your own CSV. Sample data only.">
+<meta name="theme-color" content="#0f2a43">
+<link rel="canonical" href="https://paulalan2509.github.io/data-dashboard/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Chai House Sales Dashboard · Data project">
+<meta property="og:description" content="Interactive dashboard with filters, accessible charts, table views and CSV upload. Sample data.">
+<meta property="og:image" content="https://paulalan2509.github.io/data-dashboard/assets/og-image.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230f2a43'/%3E%3Crect x='14' y='34' width='9' height='16' rx='3' fill='%23eb6834'/%3E%3Crect x='28' y='22' width='9' height='28' rx='3' fill='%232a78d6'/%3E%3Crect x='42' y='12' width='9' height='38' rx='3' fill='%231baf7a'/%3E%3C/svg%3E">
+<link rel="preload" href="assets/fonts/figtree-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/style.css">
+<script>try{var t=localStorage.getItem('chai.theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to the dashboard</a>
+<header class="top">
+  <div class="wrap bar">
+    <div>
+      <h1>Chai House sales</h1>
+      <p class="meta" id="metaLine">Loading data…</p>
+    </div>
+    <div class="bar-right">
+      <span class="badge" id="badge">Sample data</span>
+      <button class="ghost" id="themeBtn" type="button" aria-label="Switch colour theme">Theme</button>
+    </div>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+  <section class="filters" aria-label="Filters">
+    <div class="field">
+      <span class="lbl" id="rangeLbl">Date range</span>
+      <div class="seg" role="radiogroup" aria-labelledby="rangeLbl" id="range">
+        <button type="button" role="radio" data-days="7">Last 7 days</button>
+        <button type="button" role="radio" data-days="30">30 days</button>
+        <button type="button" role="radio" data-days="60">60 days</button>
+        <button type="button" role="radio" data-days="0">All</button>
+      </div>
+    </div>
+    <div class="field">
+      <label class="lbl" for="catSel">Category</label>
+      <select id="catSel"><option value="">All categories</option></select>
+    </div>
+    <div class="field actions">
+      <span class="lbl">Data</span>
+      <div class="btns">
+        <label class="btn" for="fileIn">Upload CSV</label>
+        <input id="fileIn" type="file" accept=".csv,text/csv" class="sr-only">
+        <button class="ghost" id="dlBtn" type="button">Download view</button>
+        <button class="ghost" id="resetBtn" type="button" hidden>Use sample data</button>
+      </div>
+    </div>
+  </section>
+  <p class="notice" id="notice" role="status" aria-live="polite" hidden></p>
+
+  <section class="kpis" aria-label="Key figures">
+    <div class="hero tile">
+      <p class="k-label">Revenue</p>
+      <p class="hero-fig" id="kRev">–</p>
+      <p class="delta" id="dRev"></p>
+    </div>
+    <div class="tile"><p class="k-label">Items sold</p><p class="k-val" id="kQty">–</p><p class="delta" id="dQty"></p></div>
+    <div class="tile"><p class="k-label">Average per day</p><p class="k-val" id="kAvg">–</p><p class="delta" id="dAvg"></p></div>
+    <div class="tile"><p class="k-label">Average item price</p><p class="k-val" id="kPrice">–</p><p class="delta" id="dPrice"></p></div>
+  </section>
+
+  <div class="grid">
+    <article class="card wide" data-card="line">
+      <header><div><h2>Daily revenue</h2><p class="insight" id="iLine"></p></div><button class="ghost tbl" type="button" aria-pressed="false">Table</button></header>
+      <div class="legend" id="lgLine"></div>
+      <div class="plot" id="pLine"></div><div class="tview" hidden></div>
+    </article>
+    <article class="card" data-card="items">
+      <header><div><h2>Top items by revenue</h2><p class="insight" id="iItems"></p></div><button class="ghost tbl" type="button" aria-pressed="false">Table</button></header>
+      <div class="plot" id="pItems"></div><div class="tview" hidden></div>
+    </article>
+    <article class="card" data-card="wd">
+      <header><div><h2>Average revenue by weekday</h2><p class="insight" id="iWd"></p></div><button class="ghost tbl" type="button" aria-pressed="false">Table</button></header>
+      <div class="plot" id="pWd"></div><div class="tview" hidden></div>
+    </article>
+    <article class="card wide" data-card="heat" id="cardHeat">
+      <header><div><h2>When customers buy</h2><p class="insight" id="iHeat"></p></div><button class="ghost tbl" type="button" aria-pressed="false">Table</button></header>
+      <div class="plot" id="pHeat"></div><div class="scale" id="scaleHeat"></div><div class="tview" hidden></div>
+    </article>
+    <article class="card wide" data-card="mix">
+      <header><div><h2>Revenue by category</h2><p class="insight" id="iMix"></p></div><button class="ghost tbl" type="button" aria-pressed="false">Table</button></header>
+      <div class="plot" id="pMix"></div><div class="legend" id="lgMix"></div><div class="tview" hidden></div>
+    </article>
+  </div>
+
+  <section class="about" aria-labelledby="ab">
+    <h2 id="ab">About this project</h2>
+    <p>This is a portfolio project by Paul Alain Nyoum. The sales shown are <strong>generated sample data</strong> for an imaginary café (90 days, fixed random seed), not real figures. Every chart is drawn by hand in SVG with no chart library, has a table view, and responds to the same filters so the numbers always agree.</p>
+    <p><strong>Try your own data:</strong> upload a CSV with the columns <code>date</code> (YYYY-MM-DD), <code>item</code>, <code>qty</code>, <code>unit_price</code>, and optionally <code>category</code> and <code>hour</code> (0 to 23). Your file is read in your browser and never uploaded anywhere.</p>
+  </section>
+</main>
+
+<footer><div class="wrap"><p>Built with HTML, CSS and vanilla JavaScript. No tracking, no libraries. <a href="https://github.com/Paulalan2509">Paul Alain Nyoum</a></p></div></footer>
+<div class="tip" id="tip" role="presentation" hidden></div>
+<script src="js/sample-data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
